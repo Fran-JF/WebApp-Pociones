@@ -1,15 +1,17 @@
 //* Realizamos las Importaciones
 import './App.css';
 //React
+import React from 'react';
+//UseState
 import { useState } from "react";
-
+//Axios
+import Axios from "axios";
 
 function App() {
-
   //Valores que se van agregando a cada uno de los campos
   const [nombre,setNombre] = useState("");
   const [descripcion,setDescripcion] = useState("");
-  const [Precio,setPrecio] = useState(0);
+  const [precio,setPrecio] = useState(0);
   const [disponibilidad,setDisponibilidad] = useState(0);
   const [categoria,setCategoria] = useState("");
   const [imagen,setImagen] = useState(null);
@@ -17,6 +19,28 @@ function App() {
 
   const listaIngredientes = ["Ojo de salamandra", "Escama de dragón", "Raíz de mandrágora", "Polvo de hada", "Sangre de unicornio"];
   
+  const añadir = () => {
+    const formData = new FormData();
+    formData.append("imagen", imagen);
+    formData.append("nombre", nombre);
+    formData.append("descripcion", descripcion);
+    formData.append("precio", precio);
+    formData.append("disponibilidad", disponibilidad);
+    formData.append("categoria", categoria);
+  
+    if (Array.isArray(ingredientes)) {
+      for (const ingrediente of ingredientes) {
+        formData.append("ingredientes[]", ingrediente);
+      }
+    } else {
+      console.log("El valor de ingredientes no es un arreglo:", ingredientes);
+    }
+  
+    Axios.post("http://localhost:3002/crearPocion", formData).then(() => {
+      alert("Poción Ingresada");
+    });
+  };  
+
   return (
     <div className="App">
       {/*Conformación del los inputs del Formulario*/}
@@ -100,7 +124,7 @@ function App() {
           ))}
         </fieldset>
 
-      <button type="submit" onClick={()=>{console.log("hola");}}>Enviar</button>   
+      <button type="submit" onClick={añadir}>Enviar</button>   
     
     </div>
     </div>

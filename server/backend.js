@@ -21,8 +21,9 @@ const db = mysql.createConnection({
     database:"pocioneswebapp"
 });
 
-//Función de guardado en la base de datos
+//Función de guardado de una pocion (haciendo la consulta en la base de datos)
 app.post("/crearPocion", upload.single("imagen"), (req, res) => {
+    //Armamos parte de nuestra consulta guardando los valores recibidos en constantes
     const imagen = req.file.filename;
     const nombre = req.body.nombre;
     const descripcion = req.body.descripcion;
@@ -32,12 +33,14 @@ app.post("/crearPocion", upload.single("imagen"), (req, res) => {
     let ingredientes = req.body.ingredientes;
     let ingredientesString = "";
 
+    //Comprobamos que la seleccion de ingredientes se resiva como un arreglo
     if (Array.isArray(ingredientes)) {
         ingredientesString = ingredientes.join(", ");
     } else {
         console.log("El valor de ingredientes no es un arreglo:", ingredientes);
     }
-
+    
+    //Generamos la consulta mysql
     db.query(
         "INSERT INTO pociones(imagen, nombre, descripcion, precio, disponibilidad, categoria, ingredientes) VALUES(?,?,?,?,?,?,?)",
         [imagen, nombre, descripcion, precio, disponibilidad, categoria, ingredientesString],
@@ -50,6 +53,20 @@ app.post("/crearPocion", upload.single("imagen"), (req, res) => {
     }
     );
 });  
+
+//Función de listar las pociones
+app.get("/pociones",(req,res)=>{
+    db.query('SELECT * FROM pociones',
+    //Validamos que no tengamos un error
+    (err,result)=>{
+        if(err){
+            console.log(err);
+        }else{
+            res.send(result);
+        }
+    }
+    );
+});
 
 app.listen(3002, ()=>{
     console.log("Servidor corriendo en el puerto 3002");
